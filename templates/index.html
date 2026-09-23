@@ -1,0 +1,190 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="SupportCRM customer support ticket management system">
+  <title>SupportCRM</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="/static/css/style.css">
+</head>
+<body>
+  <div id="toast-container"></div>
+
+  <header class="topbar">
+    <div class="brand">
+      <div class="brand-mark">S</div>
+      <div>
+        <div class="brand-name">SupportCRM</div>
+        <div class="brand-subtitle">Customer Support Center</div>
+      </div>
+    </div>
+    <button class="primary-btn" onclick="showCreate()">
+      <span>＋</span> New Ticket
+    </button>
+  </header>
+
+  <main class="container">
+    <section id="dashboard-view" class="view">
+      <div class="page-heading">
+        <div>
+          <p class="eyebrow">WORKSPACE</p>
+          <h1>Support Tickets</h1>
+          <p class="muted">Track, manage and resolve customer requests.</p>
+        </div>
+        <button class="primary-btn desktop-create" onclick="showCreate()">＋ Create Ticket</button>
+      </div>
+
+      <div class="stats-grid">
+        <div class="stat-card">
+          <div class="stat-icon">◫</div>
+          <div><span>Total Tickets</span><strong id="total-count">0</strong></div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-icon open">●</div>
+          <div><span>Open</span><strong id="open-count">0</strong></div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-icon progress">◐</div>
+          <div><span>In Progress</span><strong id="progress-count">0</strong></div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-icon closed">✓</div>
+          <div><span>Closed</span><strong id="closed-count">0</strong></div>
+        </div>
+      </div>
+
+      <div class="toolbar">
+        <div class="search-box">
+          <span>⌕</span>
+          <input id="search-input" type="search" placeholder="Search by ID, customer, email or issue..." autocomplete="off">
+        </div>
+        <div class="filters" id="status-filters">
+          <button class="filter-btn active" data-status="All">All</button>
+          <button class="filter-btn" data-status="Open">Open</button>
+          <button class="filter-btn" data-status="In Progress">In Progress</button>
+          <button class="filter-btn" data-status="Closed">Closed</button>
+        </div>
+      </div>
+
+      <div id="tickets-area"></div>
+    </section>
+
+    <section id="create-view" class="view hidden">
+      <div class="page-heading">
+        <div>
+          <button class="back-btn" onclick="showDashboard()">← Back to tickets</button>
+          <p class="eyebrow">NEW REQUEST</p>
+          <h1>Create Ticket</h1>
+          <p class="muted">Record a new customer support issue.</p>
+        </div>
+      </div>
+
+      <form id="create-form" class="form-card">
+        <div class="form-grid">
+          <label>
+            Customer Name
+            <input name="customer_name" required maxlength="120" placeholder="e.g. Rahul Sharma">
+          </label>
+          <label>
+            Customer Email
+            <input name="customer_email" type="email" required maxlength="160" placeholder="customer@example.com">
+          </label>
+          <label class="full">
+            Issue Title
+            <input name="subject" required maxlength="200" placeholder="e.g. Payment failed">
+          </label>
+          <label>
+            Priority
+            <select name="priority">
+              <option>Medium</option>
+              <option>High</option>
+              <option>Low</option>
+            </select>
+          </label>
+          <label class="full">
+            Description
+            <textarea name="description" required rows="7" placeholder="Describe the customer's issue clearly..."></textarea>
+          </label>
+        </div>
+        <div class="form-actions">
+          <button type="button" class="secondary-btn" onclick="showDashboard()">Cancel</button>
+          <button type="submit" class="primary-btn">Create Ticket</button>
+        </div>
+      </form>
+    </section>
+
+    <section id="detail-view" class="view hidden">
+      <div class="page-heading detail-heading">
+        <div>
+          <button class="back-btn" onclick="showDashboard()">← Back to tickets</button>
+          <p class="eyebrow">TICKET DETAILS</p>
+          <h1 id="detail-title">Ticket</h1>
+          <p class="muted" id="detail-ticket-id"></p>
+        </div>
+        <span id="detail-status" class="status-badge"></span>
+      </div>
+
+      <div class="detail-grid">
+        <div class="detail-main">
+          <article class="panel">
+            <div class="panel-title">Customer</div>
+            <div class="customer-block">
+              <div class="avatar" id="detail-avatar">R</div>
+              <div>
+                <strong id="detail-customer"></strong>
+                <a id="detail-email" href="#"></a>
+              </div>
+            </div>
+          </article>
+
+          <article class="panel">
+            <div class="panel-title">Issue Description</div>
+            <p id="detail-description" class="description-text"></p>
+          </article>
+
+          <article class="panel">
+            <div class="panel-header">
+              <div class="panel-title">Notes</div>
+              <span id="notes-count" class="count-pill">0</span>
+            </div>
+            <div id="notes-list" class="notes-list"></div>
+            <form id="note-form" class="note-form">
+              <textarea id="note-input" rows="3" placeholder="Add an internal note..."></textarea>
+              <button class="primary-btn" type="submit">Add Note</button>
+            </form>
+          </article>
+        </div>
+
+        <aside class="detail-side">
+          <article class="panel">
+            <div class="panel-title">Ticket Information</div>
+            <div class="info-list">
+              <div><span>Ticket ID</span><strong id="info-id"></strong></div>
+              <div><span>Priority</span><strong id="info-priority"></strong></div>
+              <div><span>Created</span><strong id="info-created"></strong></div>
+              <div><span>Updated</span><strong id="info-updated"></strong></div>
+            </div>
+          </article>
+
+          <article class="panel">
+            <div class="panel-title">Update Status</div>
+            <form id="status-form">
+              <select id="status-select">
+                <option>Open</option>
+                <option>In Progress</option>
+                <option>Closed</option>
+              </select>
+              <button class="primary-btn full-btn" type="submit">Update Status</button>
+            </form>
+          </article>
+        </aside>
+      </div>
+    </section>
+  </main>
+
+  <script src="/static/js/app.js"></script>
+</body>
+</html>
