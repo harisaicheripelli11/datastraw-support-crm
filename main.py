@@ -1,4 +1,7 @@
 from datetime import datetime
+from zoneinfo import ZoneInfo
+
+IST = ZoneInfo("Asia/Kolkata")
 from typing import Optional
 
 from fastapi import Depends, FastAPI, HTTPException, Query
@@ -138,7 +141,7 @@ def update_ticket(ticket_id: str, payload: TicketUpdate, db: Session = Depends(g
         raise HTTPException(status_code=404, detail="Ticket not found")
 
     ticket.status = payload.status
-    ticket.updated_at = datetime.utcnow()
+    ticket.updated_at = datetime.now(IST).replace(tzinfo=None)
 
     if payload.notes and payload.notes.strip():
         db.add(Note(ticket_id=ticket.id, note_text=payload.notes.strip()))
@@ -157,7 +160,7 @@ def add_note(ticket_id: str, payload: NoteCreate, db: Session = Depends(get_db))
         raise HTTPException(status_code=400, detail="Note cannot be empty")
 
     note = Note(ticket_id=ticket.id, note_text=payload.note_text.strip())
-    ticket.updated_at = datetime.utcnow()
+    ticket.updated_at = datetime.now(IST).replace(tzinfo=None)
     db.add(note)
     db.commit()
     db.refresh(note)
