@@ -1,9 +1,12 @@
 from datetime import datetime
+from zoneinfo import ZoneInfo
 
 from sqlalchemy import Column, DateTime, ForeignKey, Integer, String, Text
 from sqlalchemy.orm import relationship
 
 from database import Base
+
+IST = ZoneInfo("Asia/Kolkata")
 
 
 class Ticket(Base):
@@ -17,8 +20,18 @@ class Ticket(Base):
     description = Column(Text, nullable=False)
     status = Column(String(30), default="Open", nullable=False)
     priority = Column(String(20), default="Medium", nullable=False)
-    created_at = Column(DateTime, default=datetime.utcnow, nullable=False)
-    updated_at = Column(DateTime, default=datetime.utcnow, nullable=False)
+
+    created_at = Column(
+        DateTime,
+        default=lambda: datetime.now(IST).replace(tzinfo=None),
+        nullable=False,
+    )
+
+    updated_at = Column(
+        DateTime,
+        default=lambda: datetime.now(IST).replace(tzinfo=None),
+        nullable=False,
+    )
 
     notes = relationship(
         "Note",
@@ -34,6 +47,11 @@ class Note(Base):
     id = Column(Integer, primary_key=True, index=True)
     ticket_id = Column(Integer, ForeignKey("tickets.id"), nullable=False)
     note_text = Column(Text, nullable=False)
-    created_at = Column(DateTime, default=datetime.utcnow, nullable=False)
+
+    created_at = Column(
+        DateTime,
+        default=lambda: datetime.now(IST).replace(tzinfo=None),
+        nullable=False,
+    )
 
     ticket = relationship("Ticket", back_populates="notes")
